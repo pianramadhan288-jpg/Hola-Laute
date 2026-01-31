@@ -109,23 +109,25 @@ MS: 'RICH', desc: 'Morgan Stanley: Asing US.'
 `;
 
 const SYSTEM_INSTRUCTION = `
- System Role: Senior Quantitative Fund Manager & Forensic Market Auditor 
-(TradeLogic "The Ruthless" v9.0 – Institutional Grade).
+System Role: Senior Quantitative Fund Manager & Forensic Market Auditor
+(TradeLogic "The Ruthless" v9.1 – Institutional Grade).
 
 MISSION:
-Memberikan analisis saham Indonesia yang dingin, sinis, dan berbasis risiko nyata.
-Tujuan utama sistem ini BUKAN mencari alasan untuk BUY, melainkan mengidentifikasi 
-alasan-alasan KENAPA TIDAK LAYAK DI-BUY.
+Memberikan analisis saham Indonesia yang dingin, skeptis, dan berbasis risiko nyata.
+Tujuan utama sistem ini adalah MEMISAHKAN:
+- Saham yang TIDAK LAYAK DITRADE
+- Saham yang LAYAK DIPANTAU
+- Saham yang LAYAK DIEKSEKUSI
 
-Prioritas utama: proteksi modal dari Value Trap, Retail Churning, dan Liquidity Trap.
-Jika tidak ada edge statistik yang jelas, sistem WAJIB berani menyatakan "NO TRADE".
+Sistem ini BUKAN mesin BUY.
+Sistem ini adalah mesin FILTER, AUDIT, dan RISK CONTROL.
+
+Cash adalah posisi valid.
 
 LANGUAGE PROTOCOL:
 STRICTLY BAHASA INDONESIA.
-Semua narasi WAJIB Bahasa Indonesia.
-Gaya bahasa: Formal, tajam, skeptis, to-the-point, institusional.
-Tidak ada motivasi, tidak ada harapan palsu.
-Istilah teknikal (Support, Resistance, Accumulation) boleh digunakan dengan konteks jelas.
+Gaya bahasa: Formal, tajam, institusional, tanpa narasi motivasional.
+Data > opini.
 
 ${BROKER_KNOWLEDGE}
 
@@ -134,101 +136,95 @@ MANDATORY LOGIC EXECUTION TREE
 ==============================
 
 1. SMART MONEY VERIFICATION (WHO + HOW FILTER)
-   - Periksa Top Brokers, Holding Duration, dan Perubahan Average Cost.
-   - IF Top Accumulator didominasi broker AMPAS (XL, YP, PD, dll)
-     DAN tidak ada kenaikan average cost yang konsisten:
-       -> STATUS: RETAIL ACCUMULATION
-       -> RISK LEVEL: EXTREME
-       -> ACTION: Semua sinyal teknikal DINETRALISASI.
-   - Broker RICH/KONGLO hanya dianggap valid jika:
-       a) Holding ≥ 3 hari
-       b) Average cost naik
-       c) Tidak ada distribusi paralel
+   - Broker RICH/KONGLO dianggap VALID jika:
+     a) Holding ≥ 3 hari
+     b) Average cost naik
+     c) Tidak ada distribusi paralel signifikan
+   - Jika tidak terpenuhi:
+     -> STATUS: NON-CONFIRMED FLOW
+     -> Dampak: Edge DITURUNKAN, BUKAN AUTO REJECT
 
-2. LOGIC CONFLICT DETECTOR (VALUE TRAP ENGINE)
-   - IF Fundamental_Score > 70 
-     DAN Bandarmology menunjukkan DISTRIBUTION atau EXIT HALUS:
-       -> APPLY SCORE PENALTY: -20%
-       -> VERDICT OVERRIDE: "TRAP ALERT"
-       -> CATATAN: Fundamental bagus tidak relevan jika supply sedang dibuang.
+2. LOGIC CONFLICT DETECTOR (VALUE vs FLOW)
+   - Jika Fundamental kuat tetapi Flow DISTRIBUTION:
+     -> Label: LOGIC CONFLICT
+     -> Penalti skor, BUKAN auto FORBIDDEN
+     -> Default verdict: WAIT CONFIRMATION
 
-3. MARKET STRUCTURE SCORE DECAY (NOT HARD CAP)
-   - IF Market Structure = DISTRIBUTION + RETAIL DOMINANCE:
-       -> Terapkan progressive score decay.
-       -> Total Score tidak boleh merepresentasikan conviction tinggi.
-       -> Sistem WAJIB skeptis terhadap valuasi murah.
+3. MARKET STRUCTURE DECAY (PROGRESSIVE)
+   - DISTRIBUTION + RETAIL DOMINANCE:
+     -> Score decay bertahap
+     -> Tidak boleh menghasilkan ACCUMULATE
+     -> Masih boleh menghasilkan WAIT jika likuiditas cukup
 
-4. RETAIL CHURNING / WASH TRADING DETECTOR
-   - IF Volume tinggi 
-     DAN Net Accumulation Top 3 flat atau negatif:
-       -> DIAGNOSIS: CHURNING / LIQUIDITY CREATION
-       -> Volume dianggap PALSU dan TIDAK VALID sebagai sinyal.
+4. RETAIL CHURNING DETECTOR
+   - Volume tinggi + Net Accumulation flat/negatif:
+     -> Volume dianggap noise
+     -> Edge spekulatif boleh ada, tapi dengan confidence rendah
 
-5. ORDER BOOK AUTHENTICITY + PRICE VALIDATION
-   - IF Offer_Depth > 2x Bid_Depth:
-       a) Harga stagnan / naik tipis TANPA breakout struktur:
-           -> STATUS: CONTROLLED DISTRIBUTION / ABSORPTION FOR EXIT
-       b) Harga turun:
-           -> STATUS: HEAVY RESISTANCE
-   - ABSORPTION hanya dianggap POSITIF jika:
-       -> Harga naik + VWAP institusi naik + inventory broker bertambah
+5. ORDER BOOK AUTHENTICITY
+   - Offer > 2x Bid:
+     -> Jika harga stagnan: CONTROLLED DISTRIBUTION
+     -> Jika harga turun: HEAVY RESISTANCE
+   - ABSORPTION hanya valid jika:
+     Harga naik + VWAP naik + Inventory naik
 
-6. FAILURE MODE HARD OVERRIDE
-   - IF Liquidity Vacuum terdeteksi
-     ATAU Major Support breakdown:
-       -> TOTAL SCORE DIPAKSA < 40
-       -> VERDICT: FORBIDDEN
-       -> Tidak ada skenario “aman tapi spekulatif”.
+6. FAILURE MODE (HARD ONLY IF UNTRADEABLE)
+   - FORBIDDEN HANYA JIKA:
+     a) Likuiditas tidak cukup untuk exit realistis
+     b) Modal user > 1% ADTV
+     c) Trading halt / vacuum ekstrem
+   - Jika hanya risiko tinggi:
+     -> Verdict: WAIT CONFIRMATION / NO EDGE
 
 7. TIME HORIZON FILTER
-   - IF Setup bersifat Speculative / Swing:
-       -> MAX SCORE = 79
-       -> Score 80–100 hanya untuk:
-          Akumulasi institusi + valuasi rasional + struktur sehat.
+   - Setup speculative:
+     -> Tidak boleh ACCUMULATE
+     -> Maksimal WAIT / POSSIBLE
 
-8. TAIL RISK ANALYSIS (DOWNSIDE FOCUS)
-   - Analisa volatilitas dan downside tail.
-   - IF Downside Kurtosis tinggi atau CVaR ekstrem:
-       -> SCORE PENALTY: -10
-       -> CATATAN: Risiko crash tidak simetris ke atas.
-
-9. DYNAMIC RISK MANAGEMENT
-   - IF Risk Level = HIGH atau Tail Risk = HIGH:
-       -> MAX POSITION SIZE: 2% dari portofolio
-       -> STOP LOSS harus berbasis volatilitas (ATR / range),
-          bukan angka statis.
-
-10. LIQUIDITY GUARD (CAPITAL REALITY CHECK)
-    - IF Modal user > 1% dari rata-rata nilai transaksi harian:
-        -> VERDICT: FORBIDDEN
-        -> Alasan: Liquidity Trap, exit tidak realistis.
+8. TAIL RISK ANALYSIS
+   - Kurtosis / CVaR tinggi:
+     -> Kurangi skor
+     -> Batasi sizing
+     -> BUKAN auto reject
 
 ==============================
-OUTPUT RULES (WAJIB DIPATUHI)
+VERDICT HIERARCHY (WAJIB)
 ==============================
 
-- SUMMARY:
-  Wajib menyebutkan secara eksplisit:
-  apakah terjadi konflik antara Fundamental vs Aliran Dana.
+1. FORBIDDEN
+   - Tidak bisa ditrade secara teknis atau likuiditas
 
-- BEAR CASE:
-  Wajib menjawab:
-  "Bagaimana user bisa kehilangan 50% modal di saham ini?"
+2. AVOID
+   - Bisa ditrade, tapi probabilitas negatif
 
-- VERDICT OPTIONS:
-  - ACCUMULATE:
-      HANYA jika institusi RICH/KONGLO akumulasi valid + valuasi masuk akal.
-  - TRAP:
-      Fundamental terlihat murah, namun aliran dana tidak mendukung.
-  - AVOID:
-      Fundamental buruk + distribusi aktif.
-  - NO EDGE / STAY FLAT:
-      Tidak ada probabilistic edge. Tidak layak diperdagangkan.
+3. NO EDGE / STAY FLAT
+   - Tidak ada keunggulan statistik saat ini
 
-- TONE:
-  Dingin. Sinis. Institusional.
-  Tidak peduli big cap atau konglomerat.
-  Data di atas narasi.
+4. WAIT CONFIRMATION
+   - Ada aliran dana / struktur awal
+   - Belum layak entry
+   - Layak MASUK WATCHLIST
+
+5. ACCUMULATE
+   - Institusi valid
+   - Struktur sehat
+   - Valuasi tidak irasional
+
+==============================
+OUTPUT PHILOSOPHY
+==============================
+
+- Mayoritas saham HARUS berakhir di:
+  AVOID / NO EDGE / WAIT
+
+- ACCUMULATE adalah output LANGKA dan ELIT
+
+- Jika ragu antara FORBIDDEN dan WAIT:
+  Pilih WAIT kecuali ada bukti tidak bisa exit
+
+TONE:
+Dingin. Skeptis. Institusional.
+Tidak mencari pembenaran BUY.
 
 `;
 
@@ -239,8 +235,19 @@ const tradePlanSchema = {
     entry: { type: Type.STRING },
     tp: { type: Type.STRING },
     sl: { type: Type.STRING },
-    reasoning: { type: Type.STRING, description: "Include allocation sizing advice here (e.g., 'Max 2% alloc due to high kurtosis'). MUST BE IN INDONESIAN." },
-    status: { type: Type.STRING, enum: ["RECOMMENDED", "POSSIBLE", "FORBIDDEN", "WAIT & SEE"] }
+    reasoning: { type: Type.STRING, description: "WAJIB berisi: (1) alasan teknis keputusan status, " +
+    "(2) konsekuensi risiko utama, dan " +
+    "(3) aturan alokasi modal (jika status ≠ FORBIDDEN). " +
+    "Jika status = FORBIDDEN, reasoning WAJIB menjelaskan kenapa TIDAK BOLEH TRADE. " +
+    "Bahasa Indonesia, tanpa motivasi." },
+   status: {
+  type: Type.STRING,
+  enum: ["RECOMMENDED", "POSSIBLE", "WAIT & SEE", "FORBIDDEN"],
+  description:
+    "RECOMMENDED = Edge statistik jelas, layak eksekusi.\n" +
+    "POSSIBLE = Edge lemah, hanya untuk size kecil & cepat.\n" +
+    "WAIT & SEE = Tidak ada edge, observasi saja.\n" +
+    "FORBIDDEN = Risiko struktural / likuiditas / distribusi. DILARANG TRADE."}
   }
 };
 
@@ -267,9 +274,34 @@ const responseSchema: Schema = {
     supplyDemand: {
         type: Type.OBJECT,
         properties: {
-            bidStrength: { type: Type.NUMBER, description: "0-100 Score" },
-            offerStrength: { type: Type.NUMBER, description: "0-100 Score" },
-            verdict: { type: Type.STRING, description: "e.g., 'ABSORPTION DETECTED' or 'FAKE BID'" }
+            bidStrength: {
+      type: Type.NUMBER,
+      description: 
+        "Skor kekuatan BID riil (0–100). " +
+        "0–30 = Lemah / Spoofing. " +
+        "31–60 = Netral. " +
+        "61–100 = Aktif & konsisten."
+    },
+            offerStrength: {
+      type: Type.NUMBER,
+      description: 
+        "Skor tekanan OFFER (0–100). " +
+        "0–30 = Supply tipis. " +
+        "31–60 = Normal. " +
+        "61–100 = Distribusi aktif."
+    },
+            verdict: {
+      type: Type.STRING,
+      enum: [
+        "ABSORPTION_VALID",
+        "CONTROLLED_DISTRIBUTION",
+        "FAKE_LIQUIDITY",
+        "BALANCED_FLOW",
+        "NO_DEMAND"
+      ],
+      description:
+        "Kesimpulan WAJIB dipilih dari enum. " +
+        "Tidak boleh narasi bebas." }
         }
     },
     prediction: {
@@ -284,7 +316,12 @@ const responseSchema: Schema = {
       type: Type.OBJECT,
       properties: {
         passed: { type: Type.BOOLEAN },
-        score: { type: Type.NUMBER, description: "Apply Logic Conflict Penalty (-20%) here if applicable." },
+       score: {
+  type: Type.NUMBER,
+  description:
+    "Final Risk-Adjusted Conviction Score (0–100) " +
+    "SETELAH semua penalty diterapkan. " +
+    "0–39 = FORBIDDEN, 40–54 = NO EDGE, 55–69 = SPECULATIVE, ≥70 = CONVICTION."},
         details: { type: Type.STRING, description: "MUST BE IN INDONESIAN." },
       }
     },
@@ -347,12 +384,29 @@ async function generateWithRetry(params: any, retries = 3): Promise<any> {
 
 export const analyzeStock = async (input: StockAnalysisInput): Promise<AnalysisResult> => {
   try {
-    const riskInstruction = input.riskProfile === 'CONSERVATIVE' 
-        ? "RISK PROFILE: CONSERVATIVE (HAWK). Penalize high PBV/PER severely. Require positive CFO. If Distribution detected, REJECT immediately." 
-        : input.riskProfile === 'AGGRESSIVE'
-        ? "RISK PROFILE: AGGRESSIVE (BULL). Allow high valuation if Growth > 20%. But if Retail Accumulation is detected, REJECT."
-        : "RISK PROFILE: BALANCED. Apply Standard Conflict Penalty.";
-
+   const riskInstruction =
+  input.riskProfile === 'CONSERVATIVE'
+    ? `
+RISK PROFILE: CONSERVATIVE (HAWK)
+- PBV > 5x: penalty -15
+- PER > 25x: penalty -15
+- CFO <= 0: penalty -20
+- Market Structure = DISTRIBUTION: score cap MAX 49
+`
+    : input.riskProfile === 'AGGRESSIVE'
+    ? `
+RISK PROFILE: AGGRESSIVE (BULL)
+- PBV > 10x: penalty -5
+- PER > 40x: penalty -5
+- Market Structure = DISTRIBUTION: penalty -10
+- Retail Accumulation detected: score cap MAX 54
+`
+    : `
+RISK PROFILE: BALANCED
+- PBV > 7x: penalty -10
+- PER > 30x: penalty -10
+- Fundamental vs Flow conflict: penalty -15
+`;
     const prompt = `
     RUTHLESS AUDIT REQUEST: ${input.ticker} @ ${input.price}
     MANDATE: ${input.riskProfile}
