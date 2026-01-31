@@ -20,6 +20,17 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ data, onSave, isSaved = fal
   const activePlan = activeTab === 'SHORT' ? data.strategy.shortTerm : activeTab === 'MEDIUM' ? data.strategy.mediumTerm : data.strategy.longTerm;
   const isForbidden = activePlan.status === 'FORBIDDEN';
 
+  // --- LOGIC FIX: NORMALISASI ORDER FLOW ---
+  // Masalah sebelumnya: Skor AI bersifat independen (misal Bid 65, Offer 45 -> Total 110%).
+  // Solusi: Hitung proporsi relatif agar total selalu 100% untuk UI Bar.
+  const bidRaw = data.supplyDemand?.bidStrength || 0;
+  const offerRaw = data.supplyDemand?.offerStrength || 0;
+  const totalFlow = bidRaw + offerRaw || 1; // Prevent division by zero
+  
+  const bidPct = Math.round((bidRaw / totalFlow) * 100);
+  const offerPct = 100 - bidPct; // Pastikan sisa persis 100% untuk menghindari rounding error
+  // ------------------------------------------
+
   const handleCopy = async () => {
     const textBuffer = `
 [TRADELOGIC INTELLIGENCE REPORT]
@@ -32,7 +43,7 @@ VERDICT: ${activePlan.verdict}
 ${data.summary}
 
 --- MARKET STRUCTURE ---
-Bid/Offer Strength: ${data.supplyDemand.bidStrength}% / ${data.supplyDemand.offerStrength}%
+Bid/Offer Balance: ${bidPct}% vs ${offerPct}%
 Order Flow Status: ${data.supplyDemand.verdict}
 Bandar Insight: ${data.brokerAnalysis.insight}
 
@@ -140,17 +151,21 @@ ${data.fullAnalysis}
               </div>
           </Card>
 
-           {/* SUPPLY DEMAND CARD */}
-           <Card className="md:col-span-4" title="Order Flow" icon={<BarChart3 />}>
+           {/* SUPPLY DEMAND CARD (FIXED) */}
+           <Card className="md:col-span-4" title="Order Flow Ratio" icon={<BarChart3 />}>
               <div className="flex justify-between text-xs font-bold mb-2">
-                   <span className="text-emerald-400">BID: {data.supplyDemand?.bidStrength}%</span>
-                   <span className="text-rose-400">OFFER: {data.supplyDemand?.offerStrength}%</span>
+                   <span className="text-emerald-400">BID: {bidPct}%</span>
+                   <span className="text-rose-400">OFFER: {offerPct}%</span>
                </div>
                <div className="h-4 w-full bg-[#222] rounded-full overflow-hidden flex mb-4">
-                   <div className="h-full bg-emerald-500" style={{ width: `${data.supplyDemand?.bidStrength}%` }}></div>
-                   <div className="h-full bg-rose-500" style={{ width: `${data.supplyDemand?.offerStrength}%` }}></div>
+                   {/* Gunakan variabel width yang sudah dinormalisasi */}
+                   <div className="h-full bg-emerald-500" style={{ width: `${bidPct}%` }}></div>
+                   <div className="h-full bg-rose-500" style={{ width: `${offerPct}%` }}></div>
                </div>
-               <div className="text-xs text-slate-400 font-mono text-center uppercase tracking-wide">{data.supplyDemand?.verdict}</div>
+               <div className="flex justify-between items-center">
+                    <div className="text-xs text-slate-400 font-mono text-center uppercase tracking-wide">{data.supplyDemand?.verdict}</div>
+                    <div className="text-[10px] text-slate-600">Raw Score: {bidRaw}/{offerRaw}</div>
+               </div>
           </Card>
 
           {/* STRATEGY WIDGET (Main Feature) */}
