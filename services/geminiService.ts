@@ -175,8 +175,6 @@ MANDATORY LOGIC EXECUTION TREE
      c) Trading halt / vacuum ekstrem
    - Jika hanya risiko tinggi:
      -> Verdict: WAIT CONFIRMATION / NO EDGE
-   - Berikan berita tentang saham yang user masukkan beserta linknya, dan gabung berita dengan hasil analisa agar mendapatkan hasil analisa yang terbaik
-   - Gunakan bahasa ritel semi baku untuk bagian failure mode.
 
 7. TIME HORIZON FILTER
    - Setup speculative:
