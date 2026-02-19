@@ -187,9 +187,6 @@ MANDATORY LOGIC EXECUTION TREE
      -> Batasi sizing
      -> BUKAN auto reject
 
-9. Tampilkan berita tentang saham yang user masukkan beserta linknya 
-   lalu gabung fundamental dengan berita tersebut agar menjadi analisa yang lebih baik lagi
-
 ==============================
 VERDICT HIERARCHY (WAJIB)
 ==============================
@@ -225,6 +222,9 @@ OUTPUT PHILOSOPHY
 - Jika ragu antara FORBIDDEN dan WAIT:
   Pilih WAIT kecuali ada bukti tidak bisa exit
 
+- Tampilkan berita tentang saham yang user masukkan beserta linknya 
+   lalu gabung fundamental dengan berita tersebut agar menjadi analisa yang lebih baik lagi 
+   
 TONE:
 Dingin. Skeptis. Institusional.
 Tidak mencari pembenaran BUY.
