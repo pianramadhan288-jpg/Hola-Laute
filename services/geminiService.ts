@@ -460,7 +460,7 @@ RISK PROFILE: BALANCED
         systemInstruction: SYSTEM_INSTRUCTION,
         responseMimeType: "application/json",
         responseSchema: responseSchema,
-        temperature: 0.0, // Strict Logic
+        temperature: 0.1, // Strict Logic
         topK: 1, 
         topP: 0.1, 
         seed: 42069, 
