@@ -351,7 +351,7 @@ export default function App() {
                         <span className="font-mono text-sm font-bold uppercase tracking-widest">Protocol Warning</span>
                     </div>
                     <h2 className="text-3xl font-bold text-white mb-2">Musuh Terbesar Adalah Diri Sendiri</h2>
-                    <p className="text-slate-400">TradeLogic adalah senjata presisi tinggi, tetapi jari di pelatuknya adalah milik Anda.</p>
+                    <p className="text-slate-400">TradeLogic adalah senjata presisi tinggi, tetapi jari di pelatuknya adalah milik Anda. halah jembot</p>
                 </div>
                 
                 <div className="p-8 space-y-8">
